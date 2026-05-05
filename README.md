@@ -12,5 +12,4 @@ uv sync
 
 - [x] Download the dataset
 - [x] Convert to YOLO format
-- [ ] Hyperparameter tuning
 - [ ] Wait for a couple of days
