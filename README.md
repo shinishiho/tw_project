@@ -191,6 +191,42 @@ model.train(
 
 ![alt text](imgs/stage_2_rc_1.png)
 
+#### Damn it overfitted
+
+```py
+model.train(
+    data=yaml_path,
+    epochs=100,
+    imgsz=960,
+    batch=16,
+    optimizer="MuSGD",
+    lr0=1e-4,
+    lrf=0.02,
+    momentum=0.937,
+    warmup_epochs=5,
+    name="llvip_yolo26s_stage_2_rc_2",
+    patience=50,
+    cache='disk',
+    trainer=CustomSaveTrainer,
+    exist_ok=True,
+    close_mosaic=30,
+    # Augmentation
+    hsv_h=0.0,
+    hsv_s=0.0,
+    hsv_v=0.2,
+    degrees=5.0,
+    translate=0.2,
+    scale=0.4,
+    flipud=0.0,
+    fliplr=0.5,
+    mosaic=0.2,
+    mixup=0.0,
+    erasing=0.2,
+)
+```
+
+![alt text](imgs/stage_2_rc_2.png)
+
 ## Stage 2
 
 - [ ] Obtain FLIR thermal dataset

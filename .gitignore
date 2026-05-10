@@ -13,5 +13,5 @@ wheels/
 .ipynb_checkpoints
 
 # Dataset files
-datasets.zip
+*.zip
 datasets/
