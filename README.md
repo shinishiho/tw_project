@@ -14,5 +14,5 @@ uv sync
 
 ## Stage 2
 
-- [ ] Build LLM system prompt
-- [ ] Eval
+- [x] Build LLM system prompt
+- [x] Eval
