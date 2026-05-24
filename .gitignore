@@ -13,5 +13,8 @@ wheels/
 .ipynb_checkpoints
 
 # Dataset files
-*.zip
+LLVIP.zip
 datasets/
+
+# Generated files
+runs/
