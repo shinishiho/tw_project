@@ -13,5 +13,6 @@ dependencies = [
     "pydantic>=2.13.4",
     "scikit-learn>=1.8.0",
     "seaborn>=0.13.2",
+    "gradio>=5.0.0",
     "ultralytics>=8.4.46",
 ]
