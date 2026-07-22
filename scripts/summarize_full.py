@@ -69,10 +69,6 @@ def _percentile(values: list[float], percentile: float) -> float:
     return ordered[math.ceil(percentile * len(ordered)) - 1]
 
 
-def _fmt_interval(value: dict[str, float]) -> str:
-    return f"{value['estimate']:.3f} [{value['low']:.3f}, {value['high']:.3f}]"
-
-
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as source:
@@ -120,7 +116,6 @@ def main() -> None:
         type=Path,
         default=Path("artifacts/full/full_summary.json"),
     )
-    parser.add_argument("--report", type=Path, default=Path("reports/RESULTS.md"))
     args = parser.parse_args()
 
     attribute_manifest = json.loads(args.attributes.read_text())
@@ -311,178 +306,7 @@ def main() -> None:
     args.json_output.parent.mkdir(parents=True, exist_ok=True)
     args.json_output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
 
-    lines = [
-        "# Locked Full-Test Results",
-        "",
-        f"All six runs contain exactly {EXPECTED_IMAGES:,} paired official test IDs. "
-        f"Intervals are 95% paired image-level percentile bootstrap intervals "
-        f"({args.replicates:,} replicates; seed {args.seed}).",
-        "",
-        "## Primary confidence-independent metrics at IoU 0.50",
-        "",
-        "| Run | P [95% CI] | R [95% CI] | F1 [95% CI] | Mean matched IoU | FP/image | FN/image |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
-    ]
-    for name, run in runs.items():
-        metrics = run["metrics"]["iou_0.50"]
-        lines.append(
-            f"| {name} | {_fmt_interval(metrics['precision'])} | "
-            f"{_fmt_interval(metrics['recall'])} | {_fmt_interval(metrics['f1'])} | "
-            f"{_fmt_interval(metrics['mean_matched_iou'])} | "
-            f"{_fmt_interval(metrics['false_positives_per_image'])} | "
-            f"{_fmt_interval(metrics['false_negatives_per_image'])} |"
-        )
-    lines.extend(
-        [
-            "",
-            "![Primary F1 estimates with paired bootstrap intervals]"
-            "(figures/primary-f1.png)",
-            "",
-            "### Output audit",
-            "",
-            "| Run | Status counts | Duplicate-box rate | Malformed rate | No-output rate | Error rate |",
-            "| --- | --- | ---: | ---: | ---: | ---: |",
-        ]
-    )
-    for name, run in runs.items():
-        metrics = run["metrics"]["iou_0.50"]
-        status_counts = ", ".join(
-            f"{status}={count}" for status, count in run["status_counts"].items()
-        )
-        lines.append(
-            f"| {name} | {status_counts} | "
-            f"{metrics['duplicate_box_rate']['estimate']:.4f} | "
-            f"{metrics['malformed_output_rate']['estimate']:.4f} | "
-            f"{metrics['no_output_rate']['estimate']:.4f} | "
-            f"{metrics['error_output_rate']['estimate']:.4f} |"
-        )
-    lines.extend(
-        [
-            "",
-            "## Dataset-only strata at IoU 0.50",
-            "",
-            "Brightness quintiles use visible-image intensity for both paired modalities "
-            "(Q0 darkest, Q4 brightest). Values are F1 point estimates.",
-            "",
-            "| Run | Q0 | Q1 | Q2 | Q3 | Q4 |",
-            "| --- | ---: | ---: | ---: | ---: | ---: |",
-        ]
-    )
-    for name, run in runs.items():
-        brightness = run["strata_iou_0.50"]["brightness_quintile"]
-        lines.append(
-            f"| {name} | "
-            + " | ".join(f"{brightness[str(q)]['metrics']['f1']:.3f}" for q in range(5))
-            + " |"
-        )
-    lines.extend(
-        [
-            "",
-            "| Run | 1 person | 2 people | 3-4 | 5-8 | 9+ |",
-            "| --- | ---: | ---: | ---: | ---: | ---: |",
-        ]
-    )
-    for name, run in runs.items():
-        crowd = run["strata_iou_0.50"]["crowd_bin"]
-        lines.append(
-            f"| {name} | "
-            + " | ".join(
-                f"{crowd[value]['metrics']['f1']:.3f}"
-                for value in ("1", "2", "3-4", "5-8", "9+")
-            )
-            + " |"
-        )
-    lines.extend(
-        [
-            "",
-            "Object-size values are ground-truth recall using COCO native-pixel area "
-            "thresholds. LLVIP's locked test labels contain no small boxes under this definition.",
-            "",
-            "| Run | Medium recall | Large recall |",
-            "| --- | ---: | ---: |",
-        ]
-    )
-    for name, run in runs.items():
-        size_recall = run["ground_truth_box_size_recall_iou_0.50"]
-        lines.append(
-            f"| {name} | {size_recall['medium']['recall']:.3f} | "
-            f"{size_recall['large']['recall']:.3f} |"
-        )
-    lines.extend(
-        [
-            "",
-            "![F1 across brightness and crowd strata]"
-            "(figures/stratified-f1.png)",
-            "",
-            "## Paired F1 differences (left minus right)",
-            "",
-            "| Comparison | IoU 0.50 | IoU 0.75 |",
-            "| --- | ---: | ---: |",
-        ]
-    )
-    for name, differences in comparisons.items():
-        lines.append(
-            f"| {name} | {_fmt_interval(differences['iou_0.50']['f1'])} | "
-            f"{_fmt_interval(differences['iou_0.75']['f1'])} |"
-        )
-    lines.extend(
-        [
-            "",
-            "![Paired F1 differences with confidence intervals]"
-            "(figures/paired-f1-differences.png)",
-            "",
-            "## Secondary YOLO confidence-sweep metrics",
-            "",
-            "| Run | AP50 | AP75 | mAP50-95 |",
-            "| --- | ---: | ---: | ---: |",
-        ]
-    )
-    for name in AP_FILES:
-        ap = runs[name]["secondary_yolo_ap"]
-        lines.append(
-            f"| {name} | {ap['ap50']:.3f} | {ap['ap75']:.3f} | {ap['map50_95']:.3f} |"
-        )
-    lines.extend(
-        [
-            "",
-            "## Warm batch-1 efficiency",
-            "",
-            "| Run | Median ms | p95 ms | Images/s | Peak GiB | Cost/1,000 |",
-            "| --- | ---: | ---: | ---: | ---: | ---: |",
-        ]
-    )
-    for name, run in runs.items():
-        efficiency = run["efficiency"]
-        lines.append(
-            f"| {name} | {efficiency['median_latency_ms']:.1f} | "
-            f"{efficiency['p95_latency_ms']:.1f} | "
-            f"{efficiency['warm_batch1_images_per_second']:.3f} | "
-            f"{efficiency['peak_gpu_memory_gib']:.2f} | "
-            f"${efficiency['warm_batch1_cost_per_1000_usd']:.3f} |"
-        )
-    lines.extend(
-        [
-            "",
-            "![Accuracy and warm batch-1 latency]"
-            "(figures/accuracy-latency.png)",
-            "",
-            "Efficiency uses per-record warm batch-1 latency and Modal's July 22, "
-            "2026 L40S GPU rate of $0.000542/second. It excludes cold start, host "
-            "CPU/memory, storage, and optimized batch throughput.",
-            "",
-            "YOLO AP metrics come from a separate confidence-0.001 sweep and are not "
-            "inferred from the confidence-0.25 primary records.",
-            "",
-            "Fixed disagreement selection and inspected overlays are documented in "
-            "`reports/QUALITATIVE.md`.",
-            "",
-            "Current pricing: https://modal.com/pricing",
-            "",
-        ]
-    )
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text("\n".join(lines))
-    print(f"Wrote {args.json_output} and {args.report}")
+    print(f"Wrote {args.json_output}")
 
 
 if __name__ == "__main__":

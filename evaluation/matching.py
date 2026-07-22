@@ -19,6 +19,7 @@ class ImageMatches:
     matches: tuple[BoxMatch, ...]
     false_positive_indices: tuple[int, ...]
     false_negative_indices: tuple[int, ...]
+    ignored_prediction_indices: tuple[int, ...] = ()
 
 
 @dataclass
@@ -43,6 +44,17 @@ def intersection_over_union(left: Box, right: Box) -> float:
     left_area = (left.x2 - left.x1) * (left.y2 - left.y1)
     right_area = (right.x2 - right.x1) * (right.y2 - right.y1)
     return intersection / (left_area + right_area - intersection)
+
+
+def intersection_over_prediction(left: Box, ignored_region: Box) -> float:
+    """Return COCO crowd overlap: intersection divided by detection area."""
+    x1 = max(left.x1, ignored_region.x1)
+    y1 = max(left.y1, ignored_region.y1)
+    x2 = min(left.x2, ignored_region.x2)
+    y2 = min(left.y2, ignored_region.y2)
+    intersection = max(0.0, x2 - x1) * max(0.0, y2 - y1)
+    area = (left.x2 - left.x1) * (left.y2 - left.y1)
+    return intersection / area if area else 0.0
 
 
 def _add_edge(
@@ -160,4 +172,40 @@ def match_boxes(
         tuple(
             index for index in range(ground_truth_count) if index not in matched_truth
         ),
+    )
+
+
+def match_boxes_with_ignored_regions(
+    predictions: tuple[Box, ...] | list[Box],
+    ground_truth: tuple[Box, ...] | list[Box],
+    ignored_regions: tuple[Box, ...] | list[Box],
+    iou_threshold: float,
+) -> ImageMatches:
+    """Match ordinary boxes, then ignore unmatched detections on COCO crowds.
+
+    COCO crowd matching uses intersection over detection area rather than the
+    ordinary union denominator. A crowd can therefore absorb multiple otherwise
+    false-positive detections.
+    """
+    matched = match_boxes(predictions, ground_truth, iou_threshold)
+    ignored = tuple(
+        index
+        for index in matched.false_positive_indices
+        if any(
+            predictions[index].label == region.label
+            and intersection_over_prediction(predictions[index], region)
+            >= iou_threshold
+            for region in ignored_regions
+        )
+    )
+    ignored_set = set(ignored)
+    return ImageMatches(
+        matches=matched.matches,
+        false_positive_indices=tuple(
+            index
+            for index in matched.false_positive_indices
+            if index not in ignored_set
+        ),
+        false_negative_indices=matched.false_negative_indices,
+        ignored_prediction_indices=ignored,
     )

@@ -27,6 +27,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from evaluation.locate_anything import parse_locate_anything_boxes  # noqa: E402
+from evaluation.io import append_prediction_jsonl  # noqa: E402
 from evaluation.schema import PredictionRecord  # noqa: E402
 from evaluation.yolo import yolo_result_to_record  # noqa: E402
 
@@ -183,12 +184,6 @@ def _read_completed(
     return completed
 
 
-def _append_record(path: Path, record: PredictionRecord) -> None:
-    with path.open("a", encoding="utf-8") as output:
-        output.write(json.dumps(record.to_dict(), sort_keys=True) + "\n")
-        output.flush()
-
-
 @app.cls(
     image=yolo_image,
     gpu="L40S",
@@ -316,7 +311,7 @@ class FullYoloEvaluator:
                     raw_output=f"{type(error).__name__}: {error}",
                     metadata={"model_state": state},
                 )
-            _append_record(output_path, record)
+            append_prediction_jsonl(output_path, record)
             if index % 50 == 0:
                 artifact_volume.commit()
                 print(
@@ -602,7 +597,7 @@ class FullLocateAnythingEvaluator:
                     prompt=LOCATE_PROMPT,
                     metadata={"base_seed": base_seed, "image_seed": image_seed},
                 )
-            _append_record(output_path, record)
+            append_prediction_jsonl(output_path, record)
             if index % 25 == 0:
                 artifact_volume.commit()
                 print(

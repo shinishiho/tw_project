@@ -1,96 +1,84 @@
-# Fine-tuned Object Detection vs. General-purpose Grounding Vision-enabled LLM for Human Detection task on thermal images
+# Thermal pedestrian detection evaluation
 
-## Research Question
+This repository compares a compact supervised detector, YOLO26n, with the
+general-purpose LocateAnything-3B grounding model for person detection in
+visible and thermal imagery.
 
-- Can a general-purpose vision-enabled LLM beat a fine-tuned object detection
-  model on domain-shifted detection task?
-- Up-front fine-tuning cost and downstream inference performance tradeoff.
+The completed academic evaluation—including training provenance, LLVIP and
+FLIR results, qualitative errors, limitations, and pilot appendices—is in
+[reports/EVALUATION.md](reports/EVALUATION.md).
 
-## Evaluation Setup
+## What is evaluated
 
-### Dataset and Models
+- **LLVIP:** all 3,463 paired official test IDs in both visible and infrared
+  modalities.
+- **FLIR ADAS v2:** 1,144 official-validation 8-bit AGC thermal images as a
+  frozen-model external-domain test.
+- **Models:** pretrained YOLO26n, a clean LLVIP-thermal-fine-tuned YOLO26n, and
+  `nvidia/LocateAnything-3B`.
 
-- **Dataset**: [LLVIP: A Visible-infrared Paired Dataset for Low-light Vision](https://github.com/bupt-ai-cz/LLVIP)
-- **Object Detection model**: [Ultralytics YOLO](https://github.com/ultralytics/ultralytics)
-- **Vision-language Grounding model**: [LocateAnything](https://research.nvidia.com/labs/lpr/locate-anything)
+The primary comparison uses the exact boxes emitted at the locked operating
+point: YOLO confidence 0.25 and LocateAnything hybrid generation. Precision,
+recall, F1, matched IoU, FP/FN rates, output failures, and paired bootstrap
+intervals are reported at IoU 0.50 and 0.75. Separate YOLO confidence sweeps
+provide secondary AP metrics.
 
-### Environment
+## Local setup
 
-The code is designed to run on [Modal](https://modal.com) sandboxes with GPU
-acceleration.
-
-For local dataset preparation and evaluator tests:
+The local environment is only for dataset preparation, analysis, figures, and
+tests. GPU model environments are pinned inside the Modal applications.
 
 ```console
 uv venv
 uv pip install -r requirements.txt
-uv run scripts/download_dataset.py
-uv run scripts/prepare_dataset.py
 uv run -m unittest discover -s tests -v
 ```
 
-Preparation preserves the source `visible` and `infrared` directories and
-creates hard-linked YOLO trees under `datasets/LLVIP-YOLO-*`. The official
-12,025 training pairs are split by capture-sequence prefix into 9,620 training
-and 2,405 validation pairs. All 3,463 official test pairs remain locked for
-final evaluation. The versioned split and source-annotation audit are stored in
-`datasets/LLVIP-splits-v1.json`.
+## Prepare the datasets
 
-Phase 2 uses one JSONL prediction schema for every model. Once an adapter has
-produced records, evaluate them at both primary IoU thresholds with:
+Download and prepare LLVIP:
 
 ```console
-uv run scripts/evaluate_predictions.py \
-  --predictions artifacts/predictions.jsonl \
-  --dataset-dir datasets/LLVIP-YOLO-infrared \
-  --output artifacts/metrics.json
+uv run scripts/download_dataset.py
+uv run scripts/prepare_dataset.py
 ```
 
-Render TP/FP/FN assignments for hand-checking with:
+Preparation preserves the source modalities, builds leakage-free
+sequence-grouped train/validation splits, and keeps the official paired test set
+locked. The clean split contains 9,620 thermal training images, 2,405 validation
+images, and 3,463 test pairs.
+
+Download the expanded FLIR ADAS v2 archive through the
+[official Teledyne FLIR registration page](https://oem.flir.com/en-gb/solutions/automotive/adas-dataset-form/)
+and prepare only its official-validation 8-bit AGC thermal images:
 
 ```console
-uv run scripts/render_overlays.py \
-  --predictions artifacts/predictions.jsonl \
-  --dataset-dir datasets/LLVIP-YOLO-infrared \
-  --output-dir artifacts/overlays
+uv run scripts/prepare_flir.py --source FLIR_ADAS_v2.zip
 ```
 
-The inference entry points are resumable and append one validated record per
-image. YOLO26 defaults explicitly to its one-to-one end-to-end head. The
-LocateAnything runner pins the model revision recorded in `AI-ROADMAP.md`, uses
-the official person prompt and hybrid generation, converts every image to RGB,
-and preserves both raw text and parser diagnostics:
+If archive discovery is ambiguous, the command stops and lists candidates;
+resolve them explicitly with `--annotations` and `--images`. FLIR preparation
+preserves person-negative images and COCO crowd-ignore semantics.
+
+## Run the locked Modal evaluation
+
+The Modal applications verify the exact archive, split-manifest, model revision,
+and record identity before resuming a run. Upload the already prepared locked
+payloads to the volume names declared in each application.
+
+Train the clean single-seed thermal checkpoint:
 
 ```console
-uv pip install -r requirements-yolo.txt
-uv run scripts/run_yolo.py --help
-
-# In the separate NVIDIA/CUDA environment described by
-# requirements-locate-anything.txt:
-uv run scripts/run_locate_anything.py --help
+uvx modal run modal_apps/yolo_train.py \
+  --run-id yolo26n-thermal-e50-seed20260721 --epochs 50 \
+  --seed 20260721 --batch 64
 ```
 
-### Full Modal experiment
-
-The remote data Volume uses archives rather than tens of thousands of separate
-uploads. The locked paired-test payload is one 787 MB file,
-`LLVIP-test-paired.tar`, with SHA256
-`8b4db30cc40279cf04105cdf1859d6961a55182afe072617d409ccc77ec1ba6b`.
-The Modal runner verifies that hash, filters macOS AppleDouble metadata while
-extracting, verifies the split-manifest hash, and requires the exact 3,463
-paired stems before loading a model.
-
-Run the four YOLO configurations and their separate AP sweep with:
-
-```console
-uvx modal run modal_apps/full_inference.py --target yolo
-uvx modal run modal_apps/full_inference.py --target yolo-ap
-```
-
-LocateAnything supports one canonical resumable run or deterministic disjoint
-shards. The following fish-shell form runs four shards per modality in parallel:
+Run the six LLVIP model/modality combinations and the separate YOLO AP sweeps:
 
 ```fish
+uvx modal run modal_apps/full_inference.py --target yolo
+uvx modal run modal_apps/full_inference.py --target yolo-ap
 for modality in visible infrared
     for shard in 0 1 2 3
         uvx modal run modal_apps/full_inference.py \
@@ -98,67 +86,61 @@ for modality in visible infrared
     end
 end
 wait
-
 uvx modal run modal_apps/full_inference.py \
     --target finalize-visible --shard-count 4
 uvx modal run modal_apps/full_inference.py \
     --target finalize-infrared --shard-count 4
 ```
 
-The CPU-only finalizer refuses missing, duplicate, out-of-split, or mismatched
-records before atomically creating each canonical JSONL; it preserves the
-pre-shard partial file as a backup. After downloading the six canonical files
-into `artifacts/full` and four YOLO AP summaries into `artifacts/full/ap`,
-generate the locked report with:
+Run the frozen models on FLIR:
+
+```fish
+uvx modal run modal_apps/flir_inference.py --target yolo
+uvx modal run modal_apps/flir_inference.py --target yolo-ap
+for shard in 0 1 2 3
+    uvx modal run modal_apps/flir_inference.py \
+        --target locate --shard-index $shard --shard-count 4 &
+end
+wait
+uvx modal run modal_apps/flir_inference.py \
+    --target finalize-locate --shard-count 4
+```
+
+LocateAnything shards are deterministic and disjoint. The examples use fish
+shell and run all four indices before finalization.
+
+## Analyze downloaded artifacts
+
+Place the canonical LLVIP prediction JSONL files under `artifacts/full/` and
+the FLIR files under `artifacts/flir/full/`, then run:
 
 ```console
 uv run scripts/build_test_attributes.py
 uv run scripts/summarize_full.py
 uv run scripts/plot_full_results.py
 uv run scripts/select_qualitative_examples.py
+uv run scripts/summarize_flir.py --sample full
 ```
 
-The plotting script reads `artifacts/full/full_summary.json` and writes the
-report figures under `reports/figures`.
+The summarizers validate identity and completeness before writing
+machine-readable JSON. LLVIP plots go to `reports/figures/`; the qualitative
+selector also writes its fixed subset JSONL and TP/FP/FN overlays. FLIR pilot
+validation remains available with:
 
-### Methodology
-
-The Ultralytics YOLO26 model was pretrained on COCO dataset [cite], while
-LocateAnything was trained on a multi-domain dataset [cite]. In both cases,
-it is not clearly indicated that there are thermal images in the datasets,
-so it is assumed that the base models are designed for RGB image use cases.
-
-The experiment runs the models through both modalities offered by LLVIP:
-
-| Model              | RGB set | Thermal set |
-| ------------------ | ------: | ----------- |
-| Pretrained YOLO26n |     Yes | Yes         |
-| LocateAnything-3B  |     Yes | Yes         |
-| Fine-tuned YOLO26n |     Yes | Yes         |
-
-## References
-
-```tex
-@misc{jia2023llvipvisibleinfraredpaireddataset,
-title={LLVIP: A Visible-infrared Paired Dataset for Low-light Vision},
-author={Xinyu Jia and Chuang Zhu and Minzhen Li and Wenqi Tang and Shengjie Liu and Wenli Zhou},
-year={2023},
-eprint={2108.10831},
-archivePrefix={arXiv},
-primaryClass={cs.CV},
-url={https://arxiv.org/abs/2108.10831},
-}
-@article{Jocher_Ultralytics_YOLO26_Unified_2026,
-author = {Jocher, Glenn and Qiu, Jing and Liu, Mengyu and Lyu, Shuai and Akyon, Fatih Cagatay and Kalfaoglu, Muhammet Esat},
-doi = {10.48550/arXiv.2606.03748},
-title = {{Ultralytics YOLO26: Unified Real-Time End-to-End Vision Models}},
-url = {https://arxiv.org/abs/2606.03748},
-year = {2026}
-}
-@article{wang2025locateanything,
-title   = {LocateAnything: Fast and High-Quality Vision-Language Grounding with Parallel Box Decoding},
-author  = {Shihao Wang and Shilong Liu and Yuanguo Kuang and Xinyu Wei and Yangzhou Liu and Zhiqi Li and Yunze Man and Guo Chen and Andrew Tao and Guilin Liu and Jan Kautz and Lei Zhang and Zhiding Yu},
-journal = {arXiv preprint arXiv:2605.27365},
-year    = {2026},
-}
+```console
+uv run scripts/summarize_flir.py --sample pilot
 ```
+
+Pilot figures are written beneath `artifacts/flir/pilot/`, so they cannot
+overwrite the final publication figures.
+
+## Repository layout
+
+- `evaluation/`: prediction schema, parsing, matching, AP, and bootstrap logic.
+- `modal_apps/`: clean training and locked full-evaluation applications.
+- `scripts/`: dataset preparation and final analysis entry points.
+- `manifests/`: locked LLVIP attributes and LLVIP/FLIR pilot or payload
+  provenance.
+- `reports/EVALUATION.md`: reviewed consolidated evaluation.
+- `reports/figures/`: the six publication figures.
+- `artifacts/` and `datasets/`: ignored local/remote outputs and prepared data.

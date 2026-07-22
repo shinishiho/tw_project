@@ -1,9 +1,0 @@
-# PyTorch must be installed separately for the target CUDA version.
-decord==0.6.0
-lmdb==1.7.5
-numpy==1.25.0
-opencv-python-headless==4.11.0.86
-peft
-pillow==11.1.0
-torchvision
-transformers==4.57.1

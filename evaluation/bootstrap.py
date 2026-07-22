@@ -1,4 +1,4 @@
-"""Paired image-level bootstrap utilities for confidence-independent metrics."""
+"""Paired image-level bootstrap utilities for fixed-output detection metrics."""
 
 from __future__ import annotations
 
@@ -6,7 +6,10 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .matching import intersection_over_union, match_boxes
+from .matching import (
+    intersection_over_union,
+    match_boxes_with_ignored_regions,
+)
 from .schema import Box, PredictionRecord
 
 
@@ -56,6 +59,7 @@ def build_image_statistics(
     predictions: list[PredictionRecord],
     ground_truth_by_image: dict[str, tuple[Box, ...]],
     iou_threshold: float,
+    ignored_by_image: dict[str, tuple[Box, ...]] | None = None,
 ) -> ImageStatistics:
     """Match each image once and retain sufficient statistics in ID order."""
     by_id = {record.image_id: record for record in predictions}
@@ -80,16 +84,25 @@ def build_image_statistics(
     for image_id in image_ids:
         record = by_id[image_id]
         record.validate()
-        matches = match_boxes(
-            record.boxes, ground_truth_by_image[image_id], iou_threshold
+        ignored_regions = (ignored_by_image or {}).get(image_id, ())
+        matches = match_boxes_with_ignored_regions(
+            record.boxes,
+            ground_truth_by_image[image_id],
+            ignored_regions,
+            iou_threshold,
         )
         values["true_positives"].append(len(matches.matches))
         values["false_positives"].append(len(matches.false_positive_indices))
         values["false_negatives"].append(len(matches.false_negative_indices))
         values["matched_iou_sum"].append(sum(item.iou for item in matches.matches))
         values["matched_iou_count"].append(len(matches.matches))
-        values["duplicate_boxes"].append(_duplicate_count(record.boxes))
-        values["predicted_boxes"].append(len(record.boxes))
+        scored_boxes = tuple(
+            box
+            for index, box in enumerate(record.boxes)
+            if index not in set(matches.ignored_prediction_indices)
+        )
+        values["duplicate_boxes"].append(_duplicate_count(scored_boxes))
+        values["predicted_boxes"].append(len(scored_boxes))
         values["malformed_outputs"].append(record.status == "malformed")
         values["no_outputs"].append(record.status == "no_output")
         values["error_outputs"].append(record.status == "error")
@@ -215,12 +228,21 @@ def bootstrap_intervals(
     seed: int = 20260721,
     confidence: float = 0.95,
     chunk_size: int = 256,
+    groups_by_image: dict[str, str] | None = None,
 ) -> dict[str, dict[str, float]]:
     """Return percentile intervals from paired image resampling."""
     if replicates <= 0:
         raise ValueError("replicates must be positive")
     if not 0 < confidence < 1:
         raise ValueError("confidence must be between zero and one")
+    if groups_by_image is not None:
+        return _clustered_bootstrap_intervals(
+            statistics,
+            groups_by_image=groups_by_image,
+            replicates=replicates,
+            seed=seed,
+            confidence=confidence,
+        )
     rng = np.random.default_rng(seed)
     samples = {name: [] for name in METRIC_NAMES}
     image_count = len(statistics.image_ids)
@@ -249,6 +271,7 @@ def paired_bootstrap_differences(
     seed: int = 20260721,
     confidence: float = 0.95,
     chunk_size: int = 256,
+    groups_by_image: dict[str, str] | None = None,
 ) -> dict[str, dict[str, float]]:
     """Return left-minus-right metric differences using identical resamples."""
     if left.image_ids != right.image_ids:
@@ -259,6 +282,15 @@ def paired_bootstrap_differences(
         raise ValueError("replicates must be positive")
     if not 0 < confidence < 1:
         raise ValueError("confidence must be between zero and one")
+    if groups_by_image is not None:
+        return _clustered_paired_differences(
+            left,
+            right,
+            groups_by_image=groups_by_image,
+            replicates=replicates,
+            seed=seed,
+            confidence=confidence,
+        )
     rng = np.random.default_rng(seed)
     samples = {name: [] for name in METRIC_NAMES}
     image_count = len(left.image_ids)
@@ -279,4 +311,156 @@ def paired_bootstrap_differences(
             "high": float(np.quantile(np.concatenate(samples[name]), 1 - alpha)),
         }
         for name in METRIC_NAMES
+    }
+
+
+def _group_positions(
+    statistics: ImageStatistics, groups_by_image: dict[str, str]
+) -> tuple[tuple[str, ...], dict[str, np.ndarray]]:
+    if set(groups_by_image) != set(statistics.image_ids):
+        missing = sorted(set(statistics.image_ids) - set(groups_by_image))[:5]
+        extra = sorted(set(groups_by_image) - set(statistics.image_ids))[:5]
+        raise ValueError(f"group/image mismatch; missing={missing}, extra={extra}")
+    groups = tuple(sorted(set(groups_by_image.values())))
+    positions = {
+        group: np.asarray(
+            [
+                index
+                for index, image_id in enumerate(statistics.image_ids)
+                if groups_by_image[image_id] == group
+            ],
+            dtype=np.int64,
+        )
+        for group in groups
+    }
+    return groups, positions
+
+
+def _cluster_indices(
+    rng: np.random.Generator,
+    groups: tuple[str, ...],
+    positions: dict[str, np.ndarray],
+) -> np.ndarray:
+    sampled = rng.choice(groups, size=len(groups), replace=True)
+    return np.concatenate([positions[str(group)] for group in sampled])
+
+
+def _clustered_bootstrap_intervals(
+    statistics: ImageStatistics,
+    *,
+    groups_by_image: dict[str, str],
+    replicates: int,
+    seed: int,
+    confidence: float,
+) -> dict[str, dict[str, float]]:
+    groups, positions = _group_positions(statistics, groups_by_image)
+    rng = np.random.default_rng(seed)
+    samples = {name: [] for name in METRIC_NAMES}
+    for _ in range(replicates):
+        values = _metrics_from_indices(
+            statistics, _cluster_indices(rng, groups, positions)
+        )
+        for name in METRIC_NAMES:
+            samples[name].append(float(values[name][0]))
+    alpha = (1 - confidence) / 2
+    point = aggregate_metrics(statistics)
+    return {
+        name: {
+            "estimate": point[name],
+            "low": float(np.quantile(samples[name], alpha)),
+            "high": float(np.quantile(samples[name], 1 - alpha)),
+        }
+        for name in METRIC_NAMES
+    }
+
+
+def _clustered_paired_differences(
+    left: ImageStatistics,
+    right: ImageStatistics,
+    *,
+    groups_by_image: dict[str, str],
+    replicates: int,
+    seed: int,
+    confidence: float,
+) -> dict[str, dict[str, float]]:
+    if left.image_ids != right.image_ids:
+        raise ValueError(
+            "paired bootstrap inputs must have identical ordered image IDs"
+        )
+    groups, positions = _group_positions(left, groups_by_image)
+    rng = np.random.default_rng(seed)
+    samples = {name: [] for name in METRIC_NAMES}
+    for _ in range(replicates):
+        indices = _cluster_indices(rng, groups, positions)
+        left_values = _metrics_from_indices(left, indices)
+        right_values = _metrics_from_indices(right, indices)
+        for name in METRIC_NAMES:
+            samples[name].append(float(left_values[name][0] - right_values[name][0]))
+    alpha = (1 - confidence) / 2
+    left_point = aggregate_metrics(left)
+    right_point = aggregate_metrics(right)
+    return {
+        name: {
+            "estimate": left_point[name] - right_point[name],
+            "low": float(np.quantile(samples[name], alpha)),
+            "high": float(np.quantile(samples[name], 1 - alpha)),
+        }
+        for name in METRIC_NAMES
+    }
+
+
+def independent_paired_difference_of_differences(
+    first_left: ImageStatistics,
+    first_right: ImageStatistics,
+    second_left: ImageStatistics,
+    second_right: ImageStatistics,
+    *,
+    first_groups: dict[str, str] | None = None,
+    second_groups: dict[str, str] | None = None,
+    metric: str = "f1",
+    replicates: int = 2_000,
+    seed: int = 20260721,
+    confidence: float = 0.95,
+) -> dict[str, float]:
+    """Bootstrap (left-right) in one dataset minus that in another dataset."""
+    if metric not in METRIC_NAMES:
+        raise ValueError(f"unknown metric: {metric}")
+    if first_left.image_ids != first_right.image_ids:
+        raise ValueError("first paired inputs have different image IDs")
+    if second_left.image_ids != second_right.image_ids:
+        raise ValueError("second paired inputs have different image IDs")
+    rng = np.random.default_rng(seed)
+
+    def setup(statistics, groups):
+        if groups is None:
+            ids = tuple(str(index) for index in range(len(statistics.image_ids)))
+            return ids, {item: np.asarray([int(item)], dtype=np.int64) for item in ids}
+        return _group_positions(statistics, groups)
+
+    first_names, first_positions = setup(first_left, first_groups)
+    second_names, second_positions = setup(second_left, second_groups)
+    samples = []
+    for _ in range(replicates):
+        first_indices = _cluster_indices(rng, first_names, first_positions)
+        second_indices = _cluster_indices(rng, second_names, second_positions)
+        first_delta = (
+            _metrics_from_indices(first_left, first_indices)[metric][0]
+            - _metrics_from_indices(first_right, first_indices)[metric][0]
+        )
+        second_delta = (
+            _metrics_from_indices(second_left, second_indices)[metric][0]
+            - _metrics_from_indices(second_right, second_indices)[metric][0]
+        )
+        samples.append(float(first_delta - second_delta))
+    first_point = (
+        aggregate_metrics(first_left)[metric] - aggregate_metrics(first_right)[metric]
+    )
+    second_point = (
+        aggregate_metrics(second_left)[metric] - aggregate_metrics(second_right)[metric]
+    )
+    alpha = (1 - confidence) / 2
+    return {
+        "estimate": first_point - second_point,
+        "low": float(np.quantile(samples, alpha)),
+        "high": float(np.quantile(samples, 1 - alpha)),
     }

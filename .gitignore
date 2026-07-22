@@ -2,5 +2,6 @@
 __pycache__/
 *.py[cod]
 LLVIP.zip
+FLIR_ADAS_v2.zip
 artifacts/
 datasets/

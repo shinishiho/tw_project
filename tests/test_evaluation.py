@@ -18,7 +18,6 @@ from evaluation.io import (
 )
 from evaluation.locate_anything import parse_locate_anything_boxes
 from evaluation.matching import match_boxes
-from evaluation.metrics import evaluate_records
 from evaluation.schema import Box, PredictionRecord
 from evaluation.yolo import yolo_result_to_record
 
@@ -87,7 +86,7 @@ class MatchingTests(unittest.TestCase):
 
 
 class MetricTests(unittest.TestCase):
-    def test_aggregates_traceable_confidence_independent_metrics(self) -> None:
+    def test_aggregates_traceable_fixed_output_metrics(self) -> None:
         record = PredictionRecord(
             run_id="run-1",
             image_id="010001",
@@ -99,18 +98,18 @@ class MetricTests(unittest.TestCase):
             boxes=(Box(0, 0, 10, 10), Box(0, 0, 10, 10), Box(50, 50, 60, 60)),
             status="malformed",
         )
-        summary = evaluate_records(
+        statistics = build_image_statistics(
             [record], {"010001": (Box(0, 0, 10, 10),)}, iou_threshold=0.5
         )
-        self.assertEqual(summary.true_positives, 1)
-        self.assertEqual(summary.false_positives, 2)
-        self.assertEqual(summary.false_negatives, 0)
-        self.assertAlmostEqual(summary.precision, 1 / 3)
-        self.assertEqual(summary.recall, 1.0)
-        self.assertAlmostEqual(summary.duplicate_box_rate, 1 / 3)
-        self.assertEqual(summary.malformed_output_rate, 1.0)
-        self.assertEqual(summary.error_output_rate, 0.0)
-        self.assertEqual(len(summary.assignments["010001"].matches), 1)
+        metrics = aggregate_metrics(statistics)
+        self.assertEqual(int(statistics.true_positives[0]), 1)
+        self.assertEqual(int(statistics.false_positives[0]), 2)
+        self.assertEqual(int(statistics.false_negatives[0]), 0)
+        self.assertAlmostEqual(metrics["precision"], 1 / 3)
+        self.assertEqual(metrics["recall"], 1.0)
+        self.assertAlmostEqual(metrics["duplicate_box_rate"], 1 / 3)
+        self.assertEqual(metrics["malformed_output_rate"], 1.0)
+        self.assertEqual(metrics["error_output_rate"], 0.0)
 
     def test_paired_bootstrap_is_deterministic_and_preserves_pairing(self) -> None:
         predictions = [

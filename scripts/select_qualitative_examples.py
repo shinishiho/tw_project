@@ -26,6 +26,13 @@ COMPARISONS = {
     ),
 }
 
+COLORS = {
+    "matched_ground_truth": "#22c55e",
+    "matched_prediction": "#38bdf8",
+    "false_positive": "#ef4444",
+    "false_negative": "#f59e0b",
+}
+
 
 def _image_metrics(record, truth) -> dict[str, float | int]:
     matches = match_boxes(record.boxes, truth, 0.50)
@@ -65,6 +72,78 @@ def _take_unique(
     return chosen
 
 
+def _render_overlays(records, ground_truth, dataset_dir: Path, output_dir: Path) -> None:
+    from PIL import Image, ImageDraw
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for record in records:
+        image_path = dataset_dir / "images" / "test" / f"{record.image_id}.jpg"
+        matches = match_boxes(record.boxes, ground_truth[record.image_id], 0.50)
+        with Image.open(image_path).convert("RGB") as image:
+            draw = ImageDraw.Draw(image)
+            truth = ground_truth[record.image_id]
+            for match in matches.matches:
+                truth_box = truth[match.ground_truth_index]
+                prediction_box = record.boxes[match.prediction_index]
+                draw.rectangle(
+                    (truth_box.x1, truth_box.y1, truth_box.x2, truth_box.y2),
+                    outline=COLORS["matched_ground_truth"],
+                    width=5,
+                )
+                draw.rectangle(
+                    (
+                        prediction_box.x1,
+                        prediction_box.y1,
+                        prediction_box.x2,
+                        prediction_box.y2,
+                    ),
+                    outline=COLORS["matched_prediction"],
+                    width=3,
+                )
+                draw.text(
+                    (prediction_box.x1, max(0, prediction_box.y1 - 12)),
+                    f"TP IoU={match.iou:.2f}",
+                    fill=COLORS["matched_prediction"],
+                    stroke_width=2,
+                    stroke_fill="black",
+                )
+            for index in matches.false_positive_indices:
+                box = record.boxes[index]
+                draw.rectangle(
+                    (box.x1, box.y1, box.x2, box.y2),
+                    outline=COLORS["false_positive"],
+                    width=4,
+                )
+                draw.text(
+                    (box.x1, max(0, box.y1 - 12)),
+                    "FP",
+                    fill=COLORS["false_positive"],
+                    stroke_width=2,
+                    stroke_fill="black",
+                )
+            for index in matches.false_negative_indices:
+                box = truth[index]
+                draw.rectangle(
+                    (box.x1, box.y1, box.x2, box.y2),
+                    outline=COLORS["false_negative"],
+                    width=4,
+                )
+                draw.text(
+                    (box.x1, max(0, box.y1 - 12)),
+                    "FN",
+                    fill=COLORS["false_negative"],
+                    stroke_width=2,
+                    stroke_fill="black",
+                )
+            draw.rectangle((0, 0, 560, 22), fill="black")
+            draw.text(
+                (6, 5),
+                "GT matched=green  prediction matched=blue  FP=red  FN=orange",
+                fill="white",
+            )
+            image.save(output_dir / f"{record.image_id}.jpg", quality=92)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifact-dir", type=Path, default=Path("artifacts/full"))
@@ -88,6 +167,8 @@ def main() -> None:
         "comparisons": {},
     }
     subset_records = {}
+    ground_truth_by_file = {}
+    dataset_dir_by_file = {}
     for comparison_name, (modality, yolo_file, locate_file) in COMPARISONS.items():
         yolo_records = read_prediction_jsonl(args.artifact_dir / yolo_file)
         locate_records = read_prediction_jsonl(args.artifact_dir / locate_file)
@@ -163,6 +244,11 @@ def main() -> None:
         subset_records[locate_file] = [
             locate_by_id[image_id] for image_id in sorted(selected)
         ]
+        for filename in (yolo_file, locate_file):
+            ground_truth_by_file[filename] = ground_truth
+            dataset_dir_by_file[filename] = (
+                args.dataset_root / f"LLVIP-YOLO-{modality}"
+            )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     selection_path = args.output_dir / "selection.json"
@@ -175,7 +261,13 @@ def main() -> None:
                 for record in records
             )
         )
-    print(f"Wrote qualitative selection and subset JSONL files to {args.output_dir}")
+        _render_overlays(
+            records,
+            ground_truth_by_file[filename],
+            dataset_dir_by_file[filename],
+            args.output_dir / "overlays" / Path(filename).stem,
+        )
+    print(f"Wrote qualitative selection, subset JSONL, and overlays to {args.output_dir}")
 
 
 if __name__ == "__main__":

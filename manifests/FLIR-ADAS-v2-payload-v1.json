@@ -1,0 +1,14 @@
+{
+  "archive_name": "FLIR-ADAS-v2-val-infrared.tar",
+  "archive_sha256": "77e365673d82124062800889318ca57d82d13bb8203cc8107687585e2e426d16",
+  "dataset_directory": "FLIR-ADAS-v2-YOLO-infrared",
+  "dataset_id": "FLIR_ADAS_v2",
+  "dataset_release": "expanded-2022",
+  "dataset_split": "official-validation",
+  "image_count": 1144,
+  "manifest_name": "FLIR-ADAS-v2-val-v1.json",
+  "manifest_sha256": "4b989cb121ca17be6a2aa4f076bca7f9a406f216f8e6cec4cfb6d7590c2868d7",
+  "pilot_manifest_name": "FLIR-ADAS-v2-pilot-100-v1.json",
+  "pilot_manifest_sha256": "95f7d2bcd9a910f9c661ef184f84cb9bb100f43b587791fdaae1348b0b7f2d94",
+  "schema_version": 1
+}
