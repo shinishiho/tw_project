@@ -1,0 +1,915 @@
+{
+  "dataset": "LLVIP",
+  "group_allocation": {
+    "19": 24,
+    "20": 9,
+    "21": 13,
+    "22": 11,
+    "23": 14,
+    "24": 14,
+    "26": 15
+  },
+  "method": "Hamilton allocation by capture-sequence group, then by visible-brightness quintile and ground-truth crowd bin; evenly spaced image IDs per stratum",
+  "records": [
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "19",
+      "image_id": "190001",
+      "visible_brightness": 58.640869
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "19",
+      "image_id": "190002",
+      "visible_brightness": 55.661133
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "5-8",
+      "crowd_count": 6,
+      "group_id": "19",
+      "image_id": "190006",
+      "visible_brightness": 57.565674
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "19",
+      "image_id": "190008",
+      "visible_brightness": 61.710938
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "19",
+      "image_id": "190012",
+      "visible_brightness": 65.429199
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "19",
+      "image_id": "190013",
+      "visible_brightness": 67.276123
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "19",
+      "image_id": "190025",
+      "visible_brightness": 64.676758
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "3-4",
+      "crowd_count": 4,
+      "group_id": "19",
+      "image_id": "190232",
+      "visible_brightness": 57.256592
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "19",
+      "image_id": "190274",
+      "visible_brightness": 64.365967
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "19",
+      "image_id": "190312",
+      "visible_brightness": 63.256348
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "19",
+      "image_id": "190408",
+      "visible_brightness": 51.393799
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "19",
+      "image_id": "190450",
+      "visible_brightness": 54.579346
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "5-8",
+      "crowd_count": 6,
+      "group_id": "19",
+      "image_id": "190468",
+      "visible_brightness": 57.092529
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "5-8",
+      "crowd_count": 5,
+      "group_id": "19",
+      "image_id": "190478",
+      "visible_brightness": 65.334229
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "19",
+      "image_id": "190523",
+      "visible_brightness": 64.241699
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "19",
+      "image_id": "190530",
+      "visible_brightness": 61.106445
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "19",
+      "image_id": "190584",
+      "visible_brightness": 59.258301
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "19",
+      "image_id": "190797",
+      "visible_brightness": 64.739502
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "19",
+      "image_id": "190811",
+      "visible_brightness": 65.022461
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "5-8",
+      "crowd_count": 6,
+      "group_id": "19",
+      "image_id": "190818",
+      "visible_brightness": 58.382812
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "19",
+      "image_id": "190821",
+      "visible_brightness": 67.293945
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "19",
+      "image_id": "190826",
+      "visible_brightness": 59.778564
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "19",
+      "image_id": "190829",
+      "visible_brightness": 58.057373
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "19",
+      "image_id": "190830",
+      "visible_brightness": 63.207031
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "20",
+      "image_id": "200001",
+      "visible_brightness": 24.381836
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "20",
+      "image_id": "200003",
+      "visible_brightness": 26.529297
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "20",
+      "image_id": "200007",
+      "visible_brightness": 26.187256
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "20",
+      "image_id": "200142",
+      "visible_brightness": 26.084717
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "20",
+      "image_id": "200181",
+      "visible_brightness": 24.389893
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "20",
+      "image_id": "200216",
+      "visible_brightness": 26.904053
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "20",
+      "image_id": "200315",
+      "visible_brightness": 26.21167
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "20",
+      "image_id": "200318",
+      "visible_brightness": 25.681641
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "20",
+      "image_id": "200319",
+      "visible_brightness": 26.583252
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "21",
+      "image_id": "210001",
+      "visible_brightness": 37.041748
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "21",
+      "image_id": "210002",
+      "visible_brightness": 49.045654
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "21",
+      "image_id": "210010",
+      "visible_brightness": 39.050049
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "21",
+      "image_id": "210178",
+      "visible_brightness": 61.62915
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "21",
+      "image_id": "210204",
+      "visible_brightness": 33.529053
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "21",
+      "image_id": "210208",
+      "visible_brightness": 31.958984
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "5-8",
+      "crowd_count": 6,
+      "group_id": "21",
+      "image_id": "210209",
+      "visible_brightness": 54.347168
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "3-4",
+      "crowd_count": 4,
+      "group_id": "21",
+      "image_id": "210235",
+      "visible_brightness": 32.525879
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "21",
+      "image_id": "210258",
+      "visible_brightness": 67.606689
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "21",
+      "image_id": "210277",
+      "visible_brightness": 56.276123
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "21",
+      "image_id": "210432",
+      "visible_brightness": 45.427734
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "21",
+      "image_id": "210435",
+      "visible_brightness": 46.541748
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "21",
+      "image_id": "210436",
+      "visible_brightness": 28.854248
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "22",
+      "image_id": "220001",
+      "visible_brightness": 51.192383
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "3-4",
+      "crowd_count": 4,
+      "group_id": "22",
+      "image_id": "220002",
+      "visible_brightness": 44.657715
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "22",
+      "image_id": "220013",
+      "visible_brightness": 76.129883
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "22",
+      "image_id": "220162",
+      "visible_brightness": 68.781494
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "5-8",
+      "crowd_count": 5,
+      "group_id": "22",
+      "image_id": "220177",
+      "visible_brightness": 50.71167
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "22",
+      "image_id": "220199",
+      "visible_brightness": 62.848389
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "22",
+      "image_id": "220211",
+      "visible_brightness": 48.284912
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "22",
+      "image_id": "220219",
+      "visible_brightness": 71.715088
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "3-4",
+      "crowd_count": 4,
+      "group_id": "22",
+      "image_id": "220361",
+      "visible_brightness": 49.397705
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "22",
+      "image_id": "220378",
+      "visible_brightness": 39.702637
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "22",
+      "image_id": "220381",
+      "visible_brightness": 70.597412
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "23",
+      "image_id": "230001",
+      "visible_brightness": 18.145508
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "23",
+      "image_id": "230003",
+      "visible_brightness": 26.677979
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "23",
+      "image_id": "230004",
+      "visible_brightness": 17.326172
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "3-4",
+      "crowd_count": 4,
+      "group_id": "23",
+      "image_id": "230005",
+      "visible_brightness": 23.38916
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "23",
+      "image_id": "230020",
+      "visible_brightness": 18.912842
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "5-8",
+      "crowd_count": 7,
+      "group_id": "23",
+      "image_id": "230164",
+      "visible_brightness": 19.285156
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "5-8",
+      "crowd_count": 5,
+      "group_id": "23",
+      "image_id": "230209",
+      "visible_brightness": 18.550293
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "23",
+      "image_id": "230229",
+      "visible_brightness": 26.347168
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "23",
+      "image_id": "230248",
+      "visible_brightness": 18.375732
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "23",
+      "image_id": "230458",
+      "visible_brightness": 22.249756
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "23",
+      "image_id": "230459",
+      "visible_brightness": 19.134033
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "23",
+      "image_id": "230460",
+      "visible_brightness": 18.47168
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "23",
+      "image_id": "230463",
+      "visible_brightness": 18.033936
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "23",
+      "image_id": "230466",
+      "visible_brightness": 17.275146
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "24",
+      "image_id": "240001",
+      "visible_brightness": 14.038574
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "24",
+      "image_id": "240002",
+      "visible_brightness": 13.727539
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "24",
+      "image_id": "240007",
+      "visible_brightness": 15.380127
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "24",
+      "image_id": "240132",
+      "visible_brightness": 13.599609
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "24",
+      "image_id": "240195",
+      "visible_brightness": 19.081299
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "24",
+      "image_id": "240233",
+      "visible_brightness": 14.780029
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "24",
+      "image_id": "240235",
+      "visible_brightness": 15.74707
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "24",
+      "image_id": "240246",
+      "visible_brightness": 25.60083
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "24",
+      "image_id": "240271",
+      "visible_brightness": 13.348145
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "24",
+      "image_id": "240273",
+      "visible_brightness": 21.479736
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "24",
+      "image_id": "240378",
+      "visible_brightness": 17.44043
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "24",
+      "image_id": "240494",
+      "visible_brightness": 17.731445
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "3-4",
+      "crowd_count": 4,
+      "group_id": "24",
+      "image_id": "240499",
+      "visible_brightness": 15.692139
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "24",
+      "image_id": "240500",
+      "visible_brightness": 15.986328
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "26",
+      "image_id": "260001",
+      "visible_brightness": 112.628174
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "26",
+      "image_id": "260002",
+      "visible_brightness": 112.780273
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "26",
+      "image_id": "260016",
+      "visible_brightness": 106.713623
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "26",
+      "image_id": "260161",
+      "visible_brightness": 63.228271
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "26",
+      "image_id": "260211",
+      "visible_brightness": 24.910645
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "26",
+      "image_id": "260219",
+      "visible_brightness": 14.133545
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "26",
+      "image_id": "260276",
+      "visible_brightness": 24.876465
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "26",
+      "image_id": "260281",
+      "visible_brightness": 109.684814
+    },
+    {
+      "brightness_quintile": 1,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "26",
+      "image_id": "260291",
+      "visible_brightness": 19.064209
+    },
+    {
+      "brightness_quintile": 0,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "26",
+      "image_id": "260298",
+      "visible_brightness": 13.923096
+    },
+    {
+      "brightness_quintile": 2,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "26",
+      "image_id": "260329",
+      "visible_brightness": 29.538818
+    },
+    {
+      "brightness_quintile": 3,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "26",
+      "image_id": "260348",
+      "visible_brightness": 56.139893
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "3-4",
+      "crowd_count": 3,
+      "group_id": "26",
+      "image_id": "260511",
+      "visible_brightness": 107.889404
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "2",
+      "crowd_count": 2,
+      "group_id": "26",
+      "image_id": "260531",
+      "visible_brightness": 108.255371
+    },
+    {
+      "brightness_quintile": 4,
+      "crowd_bin": "1",
+      "crowd_count": 1,
+      "group_id": "26",
+      "image_id": "260536",
+      "visible_brightness": 111.931152
+    }
+  ],
+  "sample_attribute_counts": {
+    "brightness_quintile": {
+      "0": 21,
+      "1": 20,
+      "2": 20,
+      "3": 20,
+      "4": 19
+    },
+    "crowd_bin": {
+      "1": 35,
+      "2": 29,
+      "3-4": 28,
+      "5-8": 8
+    },
+    "group_id": {
+      "19": 24,
+      "20": 9,
+      "21": 13,
+      "22": 11,
+      "23": 14,
+      "24": 14,
+      "26": 15
+    }
+  },
+  "schema_version": 1,
+  "selection_uses_model_results": false,
+  "size": 100,
+  "source_split": "official test",
+  "source_split_manifest": "datasets/LLVIP-splits-v1.json",
+  "source_split_manifest_sha256": "05facc1b82630ec515cfdb0df16617f1c6390fc5af009b4c090a8343e78b33ef",
+  "stratum_allocation": {
+    "19": {
+      "crowd=1,brightness_q=2": 1,
+      "crowd=1,brightness_q=3": 4,
+      "crowd=1,brightness_q=4": 2,
+      "crowd=2,brightness_q=3": 4,
+      "crowd=2,brightness_q=4": 2,
+      "crowd=3-4,brightness_q=2": 1,
+      "crowd=3-4,brightness_q=3": 4,
+      "crowd=3-4,brightness_q=4": 2,
+      "crowd=5-8,brightness_q=3": 3,
+      "crowd=5-8,brightness_q=4": 1
+    },
+    "20": {
+      "crowd=1,brightness_q=1": 3,
+      "crowd=2,brightness_q=1": 3,
+      "crowd=2,brightness_q=2": 1,
+      "crowd=3-4,brightness_q=1": 2
+    },
+    "21": {
+      "crowd=1,brightness_q=2": 3,
+      "crowd=1,brightness_q=3": 1,
+      "crowd=2,brightness_q=2": 3,
+      "crowd=3-4,brightness_q=2": 3,
+      "crowd=3-4,brightness_q=3": 1,
+      "crowd=3-4,brightness_q=4": 1,
+      "crowd=5-8,brightness_q=2": 1
+    },
+    "22": {
+      "crowd=1,brightness_q=2": 1,
+      "crowd=1,brightness_q=3": 1,
+      "crowd=1,brightness_q=4": 2,
+      "crowd=2,brightness_q=2": 2,
+      "crowd=2,brightness_q=4": 1,
+      "crowd=3-4,brightness_q=2": 2,
+      "crowd=3-4,brightness_q=4": 1,
+      "crowd=5-8,brightness_q=2": 1
+    },
+    "23": {
+      "crowd=1,brightness_q=0": 3,
+      "crowd=1,brightness_q=1": 2,
+      "crowd=2,brightness_q=0": 2,
+      "crowd=2,brightness_q=1": 1,
+      "crowd=3-4,brightness_q=0": 2,
+      "crowd=3-4,brightness_q=1": 2,
+      "crowd=5-8,brightness_q=0": 1,
+      "crowd=5-8,brightness_q=1": 1
+    },
+    "24": {
+      "crowd=1,brightness_q=0": 5,
+      "crowd=1,brightness_q=1": 1,
+      "crowd=2,brightness_q=0": 3,
+      "crowd=2,brightness_q=1": 1,
+      "crowd=3-4,brightness_q=0": 3,
+      "crowd=3-4,brightness_q=1": 1
+    },
+    "26": {
+      "crowd=1,brightness_q=0": 1,
+      "crowd=1,brightness_q=1": 1,
+      "crowd=1,brightness_q=3": 1,
+      "crowd=1,brightness_q=4": 3,
+      "crowd=2,brightness_q=0": 1,
+      "crowd=2,brightness_q=1": 1,
+      "crowd=2,brightness_q=2": 1,
+      "crowd=2,brightness_q=3": 1,
+      "crowd=2,brightness_q=4": 2,
+      "crowd=3-4,brightness_q=1": 1,
+      "crowd=3-4,brightness_q=4": 2
+    }
+  }
+}
